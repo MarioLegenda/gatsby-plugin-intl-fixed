@@ -49,7 +49,16 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
     languages = ["en"],
     defaultLanguage = "en",
     redirect = false,
+      skip = [],
   } = pluginOptions
+
+  let shouldSkip = false;
+  for (const s of skip) {
+    if (page.path.test(s)) {
+      shouldSkip = true;
+      break;
+    }
+  }
 
   const getMessages = (path, language) => {
     try {
@@ -69,9 +78,14 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
     }
   }
 
-  const generatePage = (routed, language) => {
+  const generatePage = (routed, language, shouldSkip) => {
     const messages = getMessages(path, language)
-    const newPath = routed ? `/${language}${page.path}` : page.path
+    let newPath = routed ? `/${language}${page.path}` : page.path
+
+    if (shouldSkip) {
+      newPath = page.path;
+    }
+
     return {
       ...page,
       path: newPath,
@@ -91,16 +105,18 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
     }
   }
 
-  const newPage = generatePage(false, defaultLanguage)
+  const newPage = generatePage(false, defaultLanguage, shouldSkip)
   deletePage(page)
   createPage(newPage)
 
   languages.forEach(language => {
-    const localePage = generatePage(true, language)
-    const regexp = new RegExp("/404/?$")
-    if (regexp.test(localePage.path)) {
-      localePage.matchPath = `/${language}/*`
+    if (!shouldSkip) {
+      const localePage = generatePage(true, language)
+      const regexp = new RegExp("/404/?$")
+      if (regexp.test(localePage.path)) {
+        localePage.matchPath = `/${language}/*`
+      }
+      createPage(localePage)
     }
-    createPage(localePage)
   })
 }
