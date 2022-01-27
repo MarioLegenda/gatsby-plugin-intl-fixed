@@ -60,7 +60,7 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
     }
   }
 
-  console.log('Should skip: ', shouldSkip);
+  console.log('Should skip: ', shouldSkip, page.path);
 
   const getMessages = (path, language) => {
     try {
@@ -108,9 +108,11 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
     }
   }
 
-  const newPage = generatePage(false, defaultLanguage, shouldSkip)
-  deletePage(page)
-  createPage(newPage)
+  if (!shouldSkip) {
+    const newPage = generatePage(false, defaultLanguage, shouldSkip)
+    deletePage(page)
+    createPage(newPage)
+  }
 
   languages.forEach(language => {
     if (!shouldSkip) {
