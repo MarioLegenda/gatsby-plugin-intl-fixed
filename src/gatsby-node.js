@@ -55,8 +55,8 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
   let shouldSkip = false;
   for (const s of skip) {
     if (s.test(page.path)) {
-      shouldSkip = true;
-      break;
+      console.log('Generating page completely skipped', page.path);
+      return;
     }
   }
 
@@ -84,11 +84,6 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
     const messages = getMessages(path, language)
     let newPath = routed ? `/${language}${page.path}` : page.path
 
-    if (shouldSkip) {
-      console.log('Generate page skipped');
-      newPath = page.path;
-    }
-
     page.path = newPath;
     page.context = {
       ...page.context,
@@ -108,6 +103,7 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
   }
 
   const newPage = generatePage(false, defaultLanguage, shouldSkip)
+  deletePage(page);
   createPage(newPage)
 
   languages.forEach(language => {
