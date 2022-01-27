@@ -54,7 +54,7 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
 
   let shouldSkip = false;
   for (const s of skip) {
-    if (page.path.test(s)) {
+    if (s.test(page.path)) {
       shouldSkip = true;
       break;
     }
