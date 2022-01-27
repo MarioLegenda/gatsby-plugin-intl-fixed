@@ -89,30 +89,26 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
       newPath = page.path;
     }
 
-    return {
-      ...page,
-      path: newPath,
-      context: {
-        ...page.context,
+    page.path = newPath;
+    page.context = {
+      ...page.context,
+      language,
+      intl: {
         language,
-        intl: {
-          language,
-          languages,
-          messages,
-          routed,
-          originalPath: page.path,
-          redirect,
-          defaultLanguage,
-        },
+        languages,
+        messages,
+        routed,
+        originalPath: page.path,
+        redirect,
+        defaultLanguage,
       },
     }
+
+    return page;
   }
 
-  if (!shouldSkip) {
-    const newPage = generatePage(false, defaultLanguage, shouldSkip)
-    deletePage(page)
-    createPage(newPage)
-  }
+  const newPage = generatePage(false, defaultLanguage, shouldSkip)
+  createPage(newPage)
 
   languages.forEach(language => {
     if (!shouldSkip) {
