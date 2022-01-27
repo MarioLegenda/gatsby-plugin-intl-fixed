@@ -60,6 +60,8 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
     }
   }
 
+  console.log('Should skip: ', shouldSkip);
+
   const getMessages = (path, language) => {
     try {
       // TODO load yaml here
@@ -83,6 +85,7 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
     let newPath = routed ? `/${language}${page.path}` : page.path
 
     if (shouldSkip) {
+      console.log('Generate page skipped');
       newPath = page.path;
     }
 
@@ -111,6 +114,7 @@ exports.onCreatePage = async ({ page, actions }, pluginOptions) => {
 
   languages.forEach(language => {
     if (!shouldSkip) {
+      console.log('Intl page created');
       const localePage = generatePage(true, language)
       const regexp = new RegExp("/404/?$")
       if (regexp.test(localePage.path)) {
